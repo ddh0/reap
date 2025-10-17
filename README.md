@@ -133,8 +133,8 @@ Please consider using the following citation if you found this work useful:
     author      = {Lasby, Mike and Lazarevich, Ivan and Sinnadurai, Nish and Lie, Sean and Ioannou, Yani and Thangarasa, Vithursan},
     year        = {2025},
     publisher   = {arXiv},
-    note        = {arXiv:??? [cs]},
-    url         = {???}, 
+    note        = {arXiv:2510.13999v1 [cs]},
+    url         = {https://arxiv.org/abs/2510.13999v1}, 
 }
 ```
 
