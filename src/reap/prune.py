@@ -4,7 +4,7 @@ import logging
 import dataclasses
 import pathlib
 import time
-from typing import Any
+from typing import Any, Optional
 import gc
 import yaml
 
@@ -14,6 +14,9 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, HfArgumentParser
 
 from accelerate.utils import set_seed
 from accelerate.hooks import remove_hook_from_module
+
+import shutil
+import os
 
 
 from reap.main import record_activations, smoke_test, create_results_directory
@@ -92,6 +95,7 @@ def prune(
     Prune the model based on the observer data and clustering.
     """
     model_attrs = MODEL_ATTRS[model.__class__.__name__]
+    logger.debug(f'model_attrs: `{model_attrs!r}`')
 
     for layer in observer_data:
         if "expert_proba" not in observer_data[layer]:
@@ -252,6 +256,11 @@ def main():
     # get local patched model if req'd
     model_name = patched_model_map(model_args.model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+
+    # save original model path
+    original_model_path = pathlib.Path(model_name)
+    logger.debug(f'saved original model path: {original_model_path!r}')
+
     # load model
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
@@ -322,6 +331,30 @@ def main():
             pruned_model_dir,
         )
         logger.info("pruning completed.")
+
+        # save the MTP layer from original model weights.
+        # we will add it back to the resulting model after pruning is done.
+
+        mtp_safetensor_filenames = ["model-mtp.safetensors", "mtp.safetensors"]
+
+        mtp_safetensors_file: Optional[str] = None
+        for fname in mtp_safetensor_filenames:
+            if os.path.exists(os.path.join(original_model_path, fname)):
+                mtp_safetensors_file = fname
+        else:
+            pass
+
+        original_mtp_path = original_model_path / mtp_safetensor_filename
+        pruned_mtp_path   = pruned_model_dir    / mtp_safetensor_filename
+
+        if original_mtp_path.exists():
+            logger.info(f"Preserving MTP layer by copying from {original_mtp_path} to {pruned_mtp_path}")
+            shutil.copy2(original_mtp_path, pruned_mtp_path)
+        else:
+            logger.warning(
+                f"MTP layer file ('{mtp_safetensor_filename}') not found in original model directory. "
+                "Skipping copy. This is expected for models without an MTP layer."
+            )
 
         # smoke test
         if reap_args.smoke_test:
