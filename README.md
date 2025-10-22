@@ -26,6 +26,8 @@ Expert pruning and merging can be used to reduce the memory overhead of Sparsely
 ## <img src="./fig/hf-transparent.png" alt="Qwen3-Coder-REAP-246B-A35B-FP8" width='20'>  HuggingFace checkpoints
 - [Qwen3-Coder-REAP-246B-A35B-FP8](https://hf.co/cerebras/Qwen3-Coder-REAP-246B-A35B-FP8)
 - [Qwen3-Coder-REAP-363B-A35B-FP8](https://hf.co/cerebras/Qwen3-Coder-REAP-363B-A35B-FP8)
+- [Qwen3-Coder-REAP-25B-A3B](https://hf.co/cerebras/Qwen3-Coder-REAP-25B-A3B)
+- [GLM-4.5-Air-REAP-82B-A12B](https://hf.co/cerebras/GLM-4.5-Air-REAP-82B-A12B)
 
 ## Installation
 
